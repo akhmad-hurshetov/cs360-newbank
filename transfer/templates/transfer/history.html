@@ -1,0 +1,35 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <h1>Transaction History</h1>
+
+        {% if transfers.count == 0 %}
+            <p>You have no transaction history.</p>
+        {% else %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>From Account</th>
+                        <th>To Account</th>
+                        <th>Date and Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transfer in transfers %}
+                        <tr>
+                            <td>{{ transfer.amount }}</td>
+                            <td>{{ transfer.sender.email }}</td>
+                            <td>{{ transfer.recipient.email }}</td>
+                            <td>{{ transfer.timestamp }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <a href="{% url 'transfers:new' %}" class="btn btn-outline-primary">Make a new transfer</a>
+    </div>
+{% endblock %}

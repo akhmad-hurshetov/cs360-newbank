@@ -1,0 +1,28 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <h1>Transfer money to another account.</h1>
+        <p>Note: You can only transfer money to accounts within the same bank.</p>
+        <p>Note: The minimum transfer amount is 100.</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if error_message %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error_message }}
+                </div>
+            {% endif %}
+
+            <label for="amount">Amount:</label><br>
+            <input type="number" id="amount" name="amount" placeholder="Amount" step="100" required><br><br>
+
+            <label for="to_account">To Account (email):</label><br>
+            <input type="email" id="to_account" name="to_account" placeholder="To Account" required><br><br>
+
+            <button type="submit" class="btn btn-outline-primary">Submit</button>
+        </form>
+    </div>
+{% endblock %}

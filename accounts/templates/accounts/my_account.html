@@ -1,0 +1,15 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <h1>Welcome, {{ account.username }}!</h1>
+        <p>Email: {{ account.email }}</p>
+        <p>Balance: {{ account.balance }}</p>
+
+        <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary">Logout</button>
+        </form>
+    </div>
+{% endblock %}
