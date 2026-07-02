@@ -38,3 +38,10 @@ def add(request):
         booking.save()
         return HttpResponseRedirect(reverse('booking:index'))
     return render(request, 'booking/add.html')
+
+def delete(request, booking_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('accounts:login'))
+    booking = Booking.objects.get(id=booking_id)
+    booking.delete()
+    return HttpResponseRedirect(reverse('booking:index'))

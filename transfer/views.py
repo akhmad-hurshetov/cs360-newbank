@@ -47,6 +47,8 @@ def transfer(request):
             error_message = "Recipient account does not exist."
             return render(request, 'transfer/transfer.html', {'error_message': error_message})
 
+        print(f"[LOG] Transfer: {current_user.username} (balance={current_user.balance}) -> {to_user.username} (balance={to_user.balance}), amount={amount}")
+
         transaction = Transaction.objects.create(
             sender=current_user,
             recipient=to_user,
