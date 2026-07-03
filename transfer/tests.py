@@ -1,6 +1,44 @@
 from django.test import TestCase
 from accounts.models import Account
+from transfer.models import Transaction
 from decimal import Decimal
+
+
+class TransactionModelTest(TestCase):
+    def setUp(self):
+        self.sender = Account.objects.create_user(
+            username='sender', password='pass', balance=Decimal('500.00')
+        )
+        self.recipient = Account.objects.create_user(
+            username='recipient', password='pass', balance=Decimal('100.00')
+        )
+
+    def test_transfer_deducts_amount_from_sender(self):
+        transaction = Transaction(sender=self.sender, recipient=self.recipient, amount=Decimal('200.00'))
+        transaction.transfer()
+        self.sender.refresh_from_db()
+        self.assertEqual(self.sender.balance, Decimal('300.00'))
+
+    def test_transfer_adds_amount_to_recipient(self):
+        transaction = Transaction(sender=self.sender, recipient=self.recipient, amount=Decimal('200.00'))
+        transaction.transfer()
+        self.recipient.refresh_from_db()
+        self.assertEqual(self.recipient.balance, Decimal('300.00'))
+
+    def test_transfer_raises_error_if_insufficient_balance(self):
+        transaction = Transaction(sender=self.sender, recipient=self.recipient, amount=Decimal('600.00'))
+        with self.assertRaises(ValueError):
+            transaction.transfer()
+
+    def test_transfer_raises_error_if_amount_is_negative(self):
+        transaction = Transaction(sender=self.sender, recipient=self.recipient, amount=Decimal('-50.00'))
+        with self.assertRaises(ValueError):
+            transaction.transfer()
+
+    def test_transfer_raises_error_if_sender_equals_recipient(self):
+        transaction = Transaction(sender=self.sender, recipient=self.sender, amount=Decimal('100.00'))
+        with self.assertRaises(ValueError):
+            transaction.transfer()
 
 
 class TransferAmountValidationTest(TestCase):
