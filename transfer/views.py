@@ -5,8 +5,6 @@ from .models import Transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from accounts.models import Account
-from django.utils import timezone
-
 
 def history(request):
     if not request.user.is_authenticated:
@@ -47,21 +45,15 @@ def transfer(request):
             error_message = "Recipient account does not exist."
             return render(request, 'transfer/transfer.html', {'error_message': error_message})
 
-        print(f"[LOG] Transfer: {current_user.username} (balance={current_user.balance}) -> {to_user.username} (balance={to_user.balance}), amount={amount}")
-
-        transaction = Transaction.objects.create(
+        transaction = Transaction(
             sender=current_user,
             recipient=to_user,
-            amount=amount,
-            timestamp=timezone.now(),
+            amount=Decimal(amount),
         )
-        transaction.save()
-
-        current_user.balance -= Decimal(amount)
-        current_user.save()
-
-        to_user.balance += Decimal(amount)
-        to_user.save()
+        try:
+            transaction.transfer()
+        except ValueError as e:
+            return render(request, 'transfer/transfer.html', {'error_message': str(e)})
 
         return HttpResponseRedirect(reverse('transfers:history'))
 
