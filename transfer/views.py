@@ -45,15 +45,13 @@ def transfer(request):
             error_message = "Recipient account does not exist."
             return render(request, 'transfer/transfer.html', {'error_message': error_message})
 
-        transaction = Transaction(
-            sender=current_user,
-            recipient=to_user,
-            amount=Decimal(amount),
-        )
-        try:
-            transaction.transfer()
-        except ValueError as e:
-            return render(request, 'transfer/transfer.html', {'error_message': str(e)})
+        Transaction.objects.create(sender=current_user, recipient=to_user, amount=Decimal(amount))
+
+        current_user.balance -= Decimal(amount)
+        current_user.save()
+
+        to_user.balance += Decimal(amount)
+        to_user.save()
 
         return HttpResponseRedirect(reverse('transfers:history'))
 
